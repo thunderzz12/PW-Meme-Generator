@@ -11,8 +11,11 @@ hide_st_style = """
             header {visibility: hidden;}
             footer {visibility: hidden;}
             .stAppDeployButton {display: none;}
+            [data-testid="stStatusWidget"] {display: none;}
+            .st-emotion-cache-zq5wms.e1nzilvr4 {display: none;} 
             .viewerBadge_container__1QSob {display: none;}
-            button[title="View source"] {display: none;}
+            div[data-testid="stToolbar"] {display: none;}
+            #stConnectionStatus {display: none;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
