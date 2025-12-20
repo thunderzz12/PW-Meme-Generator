@@ -5,6 +5,18 @@ import os
 
 st.set_page_config(page_title="Alakh Pandey Meme Maker", layout="centered")
 
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            header {visibility: hidden;}
+            footer {visibility: hidden;}
+            .stAppDeployButton {display: none;}
+            .viewerBadge_container__1QSob {display: none;}
+            button[title="View source"] {display: none;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 st.title("💀 PW Meme Generator")
 st.write("Jai ho Alakh sir")
 
