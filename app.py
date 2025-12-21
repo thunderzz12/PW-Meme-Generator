@@ -34,48 +34,60 @@ else:
             f.write(uploaded_img.getbuffer())
 
         if st.button("Generate"):
-            with st.spinner("Stretching your image and rendering video..."):
-                try:
-                    
-                    video = VideoFileClip(TEMPLATE_PATH)
-                    
-                    
-                    box_width = 359
-                    box_height = 481
-                    
-                    
-                    user_img = (ImageClip("temp_user_img.jpg")
-                                .with_duration(video.duration)
-                                .resized(new_size=(box_width, box_height))
-                                .with_position((0, 400)))
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            try:
+                status_text.text("Initializing engines...")
+                progress_bar.progress(10)
+                
+                video = VideoFileClip(TEMPLATE_PATH)
+                
+                status_text.text("Fitting your photo into the meme...")
+                progress_bar.progress(30)
+                
+                box_width = 359
+                box_height = 481
+                
+                user_img = (ImageClip("temp_user_img.jpg")
+                            .with_duration(video.duration)
+                            .resized(new_size=(box_width, box_height))
+                            .with_position((0, 400)))
 
-                    
-                    final_video = CompositeVideoClip([video, user_img]).with_audio(video.audio)
-                    
-                    
-                    final_video.audio = video.audio
+                status_text.text("Rendering video (this takes a few seconds)...")
+                progress_bar.progress(60)
+                
+                final_video = CompositeVideoClip([video, user_img]).with_audio(video.audio)
+                final_video.audio = video.audio
 
-                    output_file = "finished_meme.mp4"
-                    final_video.write_videofile(output_file, codec="libx264", audio_codec="aac", fps=24)
+                output_file = "finished_meme.mp4"
+                final_video.write_videofile(output_file, codec="libx264", audio_codec="aac", fps=24, logger=None)
 
-                    st.success("Meme Ready")
-                    col1, col2 = st.columns([1, 1]) 
+                status_text.text("Optimization complete")
+                progress_bar.progress(100)
+                
+                status_text.empty()
+                st.success("Render successful")
+                
+                col1, col2 = st.columns([1, 1]) 
 
-                    with col1:
-                        st.video(output_file, format="video/mp4")
+                with col1:
+                    st.video(output_file, format="video/mp4")
 
-                    with col2:
-                        st.info("Click below to save")
-                        with open(output_file, "rb") as file:
-                            st.download_button(
-                                label="📥 Download",
-                                data=file,
-                                file_name="PW_meme.mp4",
-                                mime="video/mp4",
-                                use_container_width=True
-                            )
-                except Exception as e:
-                    st.error(f"Something went wrong: {e}")
+                with col2:
+                    st.info("Click below to save")
+                    with open(output_file, "rb") as file:
+                        st.download_button(
+                            label="📥 Download",
+                            data=file,
+                            file_name="PW_meme.mp4",
+                            mime="video/mp4",
+                            use_container_width=True
+                        )
+            except Exception as e:
+                status_text.empty()
+                progress_bar.empty()
+                st.error(f"Something went wrong: {e}")
 
 st.write("") 
 st.divider()
