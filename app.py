@@ -1,6 +1,9 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from moviepy import VideoFileClip, ImageClip, CompositeVideoClip
 import os
+import requests
+
 
 
 st.set_page_config(page_title="Alakh Pandey Meme Maker", layout="centered")
@@ -34,6 +37,17 @@ else:
             f.write(uploaded_img.getbuffer())
 
         if st.button("Generate"):
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+
+            st.markdown("### 🕹️ Quick Game while you wait...")
+            components.html(
+                """
+                <iframe src="https://chromedino.com/" frameborder="0" scrolling="no" width="100%" height="300"></iframe>
+                """,
+                height=320,
+            )
+
             progress_bar = st.progress(0)
             status_text = st.empty()
             
@@ -97,7 +111,7 @@ st.markdown(
     .footer {
         width: 100%;
         text-align: center;
-        color: #808080; 
+        color: #808080;
         padding-top: 20px;
         padding-bottom: 20px;
         font-size: 14px;
@@ -109,3 +123,54 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+st.divider()
+st.subheader("While you're waiting...")
+st.write("Tap or press space to flap! Have fun while waiting.")
+game_html = """
+<iframe src="https://flappybird.io/" width="100%" height="400" frameborder="0" allowfullscreen></iframe>
+"""
+st.components.v1.html(game_html, height=420)
+
+st.divider()
+st.subheader("Say me hi on Discord!")
+try:
+    response = requests.get("https://api.lanyard.rest/v1/users/1408045901745885225")
+    data = response.json()
+    if data.get('success'):
+        user = data['data']
+        avatar = user['discord_user']['avatar']
+        username = user['discord_user']['username']
+        discriminator = user['discord_user']['discriminator']
+        display_name = user['discord_user'].get('global_name', username)
+        status = user['discord_status']
+        activities = user.get('activities', [])
+      
+        status_color = {'online': '#23a559', 'idle': '#f0b232', 'dnd': '#f23f43', 'offline': '#80848e'}.get(status, '#80848e')
+        
+        activity_text = ""
+        for act in activities:
+            if act['type'] == 0:  # Playing
+                activity_text += f"🎮 Playing {act['name']}<br>"
+            elif act['type'] == 2:  # Listening
+                activity_text += f"🎵 Listening to {act['name']}<br>"
+            elif act['type'] == 3:  # Watching
+                activity_text += f"📺 Watching {act['name']}<br>"
+        
+        # Build HTML
+        html = f"""
+        <div style="border: 2px solid {status_color}; border-radius: 15px; padding: 15px; background: linear-gradient(135deg, #2c2f33 0%, #23272a 100%); color: white; display: flex; align-items: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-shadow: 0 4px 8px rgba(0,0,0,0.3); max-width: 400px; margin: auto;">
+            <img src="https://cdn.discordapp.com/avatars/{user['discord_user']['id']}/{avatar}.png?size=64" style="width: 64px; height: 64px; border-radius: 50%; margin-right: 15px; border: 3px solid {status_color}; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            <div style="flex-grow: 1;">
+                <strong style="font-size: 18px; color: #ffffff;">{display_name}</strong><br>
+                <small style="color: #b9bbbe; font-size: 12px;">{username}</small><br>
+                <span style="color: {status_color}; font-weight: bold; font-size: 14px;">● {status.capitalize()}</span><br>
+                <span style="font-size: 12px; color: #b9bbbe;">{activity_text.strip()}</span>
+            </div>
+        </div>
+        """
+        st.components.v1.html(html, height=150)
+    else:
+        st.error("Failed to fetch Discord status.")
+except Exception as e:
+    st.error(f"Error loading Discord status: {e}")
