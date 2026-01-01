@@ -39,17 +39,6 @@ else:
         if st.button("Generate"):
             progress_bar = st.progress(0)
             status_text = st.empty()
-
-            st.markdown("### 🕹️ Quick Game while you wait...")
-            components.html(
-                """
-                <iframe src="https://chromedino.com/" frameborder="0" scrolling="no" width="100%" height="300"></iframe>
-                """,
-                height=320,
-            )
-
-            progress_bar = st.progress(0)
-            status_text = st.empty()
             
             try:
                 status_text.text("Initializing engines...")
